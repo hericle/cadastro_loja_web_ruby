@@ -1,0 +1,17 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Painel Admin</title>
+  <link rel="stylesheet" href="/estilo.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Bem-vindo, <%= usuario_atual.nome %> (Admin)</h1>
+    <a href="/admin/cadastrar_cliente">Cadastrar Cliente</a><br>
+    <a href="/admin/clientes">Ver Lista de Clientes</a><br>
+    <a href="/logout">Logout</a>
+  </div>
+</body>
+</html>
