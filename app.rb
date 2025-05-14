@@ -1,17 +1,20 @@
-
 require 'sinatra'
 require 'erb'
+require 'uri'
 
 enable :sessions
 
 class Usuario
-  attr_reader :nome, :email, :senha, :tipo
+  attr_accessor :nome, :email, :senha, :tipo, :telefone, :cpf, :saldo
 
-  def initialize(nome, email, senha, tipo)
+  def initialize(nome, email, senha, tipo, telefone = '', cpf = '', saldo = 0)
     @nome = nome
     @email = email
     @senha = senha
     @tipo = tipo
+    @telefone = telefone
+    @cpf = cpf
+    @saldo = saldo.to_f
   end
 
   def verificar_senha(senha)
@@ -69,23 +72,15 @@ get '/logout' do
 end
 
 get '/admin/cadastrar_cliente' do
-  if !logado?
-    redirect '/login'
-  elsif !admin?
-    @erro = "Acesso negado: somente administradores podem acessar esta página."
-    return erb admin? ? :painel_admin : :painel_cliente
-  end
+  halt(redirect '/login') unless logado?
+  halt(erb :painel_cliente) unless admin?
 
   erb :cadastro_cliente
 end
 
 post '/admin/cadastrar_cliente' do
-  if !logado?
-    redirect '/login'
-  elsif !admin?
-    @erro = "Acesso negado: somente administradores podem realizar esta ação."
-    return erb admin? ? :painel_admin : :painel_cliente
-  end
+  halt(redirect '/login') unless logado?
+  halt(erb :painel_cliente) unless admin?
 
   nome = params[:nome]
   email = params[:email]
@@ -102,12 +97,44 @@ post '/admin/cadastrar_cliente' do
 end
 
 get '/admin/clientes' do
-  redirect '/login' unless logado?
-  unless admin?
-    @erro = "Acesso negado: somente administradores podem acessar esta página."
-    return erb :painel_cliente
-  end
+  halt(redirect '/login') unless logado?
+  halt(erb :painel_cliente) unless admin?
 
   @clientes = USUARIOS.values.select { |u| u.tipo == 'cliente' }
   erb :lista_clientes
+end
+
+get '/admin/editar' do
+  halt(redirect '/login') unless logado?
+  halt(erb :painel_cliente) unless admin?
+
+  email = params[:email]
+  @cliente = USUARIOS[email]
+  if @cliente.nil?
+    @erro = "Cliente não encontrado."
+    redirect '/admin/clientes'
+  else
+    erb :editar_cliente
+  end
+end
+
+post '/admin/editar' do
+  halt(redirect '/login') unless logado?
+  halt(erb :painel_cliente) unless admin?
+
+  email = params[:email]
+  cliente = USUARIOS[email]
+
+  if cliente
+    cliente.nome     = params[:nome]
+    cliente.telefone = params[:telefone]
+    cliente.cpf      = params[:cpf]
+    cliente.saldo    = params[:saldo].to_f
+    @sucesso = "Cliente atualizado com sucesso!"
+    @cliente = cliente
+    erb :editar_cliente
+  else
+    @erro = "Cliente não encontrado."
+    redirect '/admin/clientes'
+  end
 end

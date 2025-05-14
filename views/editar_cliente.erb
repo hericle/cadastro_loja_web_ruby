@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Editar Cliente</title>
+  <link rel="stylesheet" href="/estilo.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Editar Cliente</h1>
+    <% if @erro %><p class="erro"><%= @erro %></p><% end %>
+    <% if @sucesso %><p class="sucesso"><%= @sucesso %></p><% end %>
+    <form method="post" action="/admin/editar">
+      <input type="hidden" name="email" value="<%= @cliente.email %>">
+      <input type="text" name="nome" value="<%= @cliente.nome %>" placeholder="Nome" required><br>
+      <input type="text" name="telefone" value="<%= @cliente.telefone %>" placeholder="Telefone"><br>
+      <input type="text" name="cpf" value="<%= @cliente.cpf %>" placeholder="CPF"><br>
+      <input type="number" step="0.01" name="saldo" value="<%= @cliente.saldo %>" placeholder="Saldo"><br>
+      <button type="submit">Salvar</button>
+    </form>
+    <a href="/admin/clientes">Voltar</a>
+  </div>
+</body>
+</html>
